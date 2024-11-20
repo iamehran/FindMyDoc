@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect } from 'react'; // Changed this line
+import { useEffect } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DocumentList from '../components/DocumentList';
 import { TokenManager } from '../lib/token-manager';
 
-export default function Home() {
+function MainContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Check for tokens in URL
     const tokensParam = searchParams.get('tokens');
     if (tokensParam) {
       try {
@@ -23,9 +23,15 @@ export default function Home() {
     }
   }, [searchParams]);
 
+  return <DocumentList />;
+}
+
+export default function Home() {
   return (
     <main className="container mx-auto px-4">
-      <DocumentList />
+      <Suspense fallback={<div>Loading...</div>}>
+        <MainContent />
+      </Suspense>
     </main>
   );
 }

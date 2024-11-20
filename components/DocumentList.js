@@ -1,4 +1,3 @@
-// components/DocumentList.js
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -129,7 +128,7 @@ const DocumentList = () => {
       });
     }
   };
-  // In components/DocumentList.js
+  
 
 const handleDelete = async (id, fileName) => {
   try {

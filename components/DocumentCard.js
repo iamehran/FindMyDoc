@@ -121,8 +121,8 @@ const DocumentCard = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Document</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{displayName || title}"? This action cannot be undone.
-            </AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{displayName || title}&rdquo;? This action cannot be undone.
+              </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel 

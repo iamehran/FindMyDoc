@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request) {
   try {
-    console.log("Callback received");
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     
@@ -19,7 +18,7 @@ export async function GET(request) {
     );
 
     const { tokens } = await oauth2Client.getToken(code);
-    console.log("Tokens received", tokens);
+    console.log("Tokens received");
 
     // Redirect to the main page with tokens in the URL (temporary solution)
     return NextResponse.redirect(new URL(`/?tokens=${encodeURIComponent(JSON.stringify(tokens))}`, request.url));

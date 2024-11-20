@@ -1,3 +1,5 @@
+// next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     env: {
@@ -28,4 +30,5 @@ const nextConfig = {
     },
   };
   
+  // Use CommonJS export
   module.exports = nextConfig;

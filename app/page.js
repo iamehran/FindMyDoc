@@ -1,37 +1,24 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import DocumentList from '../components/DocumentList';
 import { TokenManager } from '../lib/token-manager';
+import DocumentList from '../components/DocumentList';
 
-function MainContent() {
+export default function Home() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const tokensParam = searchParams.get('tokens');
-    if (tokensParam) {
-      try {
-        const tokens = JSON.parse(decodeURIComponent(tokensParam));
-        TokenManager.setTokens(tokens);
-        // Clear the URL
-        window.history.replaceState({}, '', '/');
-      } catch (error) {
-        console.error('Error processing tokens:', error);
-      }
+    const tokens = searchParams.get('tokens');
+    if (tokens) {
+      TokenManager.setTokens(JSON.parse(decodeURIComponent(tokens)));
+      window.history.replaceState({}, '', '/');
     }
   }, [searchParams]);
 
-  return <DocumentList />;
-}
-
-export default function Home() {
   return (
     <main className="container mx-auto px-4">
-      <Suspense fallback={<div>Loading...</div>}>
-        <MainContent />
-      </Suspense>
+      <DocumentList />
     </main>
   );
 }

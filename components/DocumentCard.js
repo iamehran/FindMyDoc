@@ -3,6 +3,10 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Edit2Icon } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
+import { TokenManager } from '../lib/token-manager';
 import { FileIcon, Trash2Icon, ExternalLinkIcon, DownloadIcon } from 'lucide-react';
 import {
   AlertDialog,
@@ -32,23 +36,48 @@ const DocumentCard = ({
   lastModified, 
   onView, 
   onDownload, 
-  onDelete 
+  onDelete,
+  onRename 
 }) => {
-  console.log("Card props:", { id, title, displayName, type });
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newDisplayName, setNewDisplayName] = useState(displayName || title);
+  const [isRenaming, setIsRenaming] = useState(false);
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
+  const handleRename = async () => {
+    if (!newDisplayName.trim()) return;
+    
     try {
-      await onDelete();
+      setIsRenaming(true);
+      const tokens = TokenManager.getTokens();
+      
+      const response = await fetch(`/api/files/${id}/rename`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${JSON.stringify(tokens)}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ displayName: newDisplayName })
+      });
+
+      if (!response.ok) throw new Error('Failed to rename file');
+
+      toast({
+        title: "Success",
+        description: "File renamed successfully",
+      });
+
+      onRename?.(id, newDisplayName);
+      setIsEditing(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to rename file",
+        variant: "destructive",
+      });
     } finally {
-      setIsDeleting(false);
-      setIsDeleteDialogOpen(false);
+      setIsRenaming(false);
     }
   };
-
-  const gradientClass = getColorByFileType(type);
 
   return (
     <>
@@ -60,14 +89,51 @@ const DocumentCard = ({
           opacity-50 group-hover:opacity-70 transition-opacity duration-300`}
         />
 
-          <CardHeader className="relative z-10">
-          <h2 className="text-3xl font-extrabold tracking-tight leading-tight 
-              bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600
-              group-hover:from-gray-800 group-hover:to-gray-500
-              transition-colors duration-300 min-h-[3.5rem] flex items-center">
-              {displayName || title}
-            </h2>
-          </CardHeader>
+<CardHeader className="relative z-10">
+  {isEditing ? (
+    <div className="flex gap-2">
+      <Input
+        value={newDisplayName}
+        onChange={(e) => setNewDisplayName(e.target.value)}
+        disabled={isRenaming}
+        autoFocus
+        className="bg-white/50"
+      />
+      <Button 
+        onClick={handleRename} 
+        disabled={isRenaming || !newDisplayName.trim()}
+        size="sm"
+      >
+        Save
+      </Button>
+      <Button 
+        onClick={() => {
+          setNewDisplayName(displayName || title);
+          setIsEditing(false);
+        }}
+        variant="outline" 
+        size="sm"
+      >
+        Cancel
+      </Button>
+    </div>
+  ) : (
+    <h2 className="text-3xl font-extrabold tracking-tight leading-tight 
+        bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600
+        group-hover:from-gray-800 group-hover:to-gray-500
+        transition-colors duration-300 min-h-[3.5rem] flex items-center gap-2">
+      {displayName || title}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={() => setIsEditing(true)}
+      >
+        <Edit2Icon className="h-4 w-4" />
+      </Button>
+    </h2>
+  )}
+</CardHeader>
 
           <CardContent className="relative z-10 space-y-2">
             {/* Original filename */}

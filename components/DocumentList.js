@@ -129,6 +129,13 @@ const DocumentList = () => {
     }
   };
   
+  const handleRename = (id, newDisplayName) => {
+    setDocuments(prev => 
+      prev.map(doc => 
+        doc.id === id ? { ...doc, displayName: newDisplayName } : doc
+      )
+    );
+  };
 
 const handleDelete = async (id, fileName) => {
   try {
@@ -251,6 +258,7 @@ const handleDelete = async (id, fileName) => {
                     onView={() => window.open(doc.viewLink, '_blank')}
                     onDownload={() => window.open(doc.viewLink, '_blank')}
                     onDelete={() => handleDelete(doc.id, doc.displayName || doc.title)}
+                    onRename={handleRename}
                   />
                 );
               })}

@@ -14,7 +14,8 @@ export async function GET(request) {
 
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: scopes
+    scope: scopes,
+    prompt: 'consent' 
   });
 
   return NextResponse.json({ url });
